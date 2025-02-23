@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Game Streaming Automation</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  <style>
+    body {
+      background: #000 url('https://www.transparenttextures.com/patterns/stellar.jpg');
+      background-size: cover;
+      padding: 20px;
+      color: #00FFFF;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 3px solid #00FFFF;
+      border-radius: 20px;
+      box-shadow: 0 0 30px #00FFFF;
+    }
+
+    h1, h2, h3 {
+      text-align: center;
+      color: #FFD700;
+    }
+
+    .tab {
+      display: flex;
+      justify-content: space-around;
+      border-bottom: 2px solid #00FFFF;
+      margin-bottom: 20px;
+    }
+
+    .tab button {
+      background: transparent;
+      border: none;
+      color: #00FFFF;
+      font-weight: bold;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 16px;
+      text-transform: uppercase;
+    }
+
+    .tab button:hover {
+      background-color: #00FF00;
+      color: #000;
+      border-radius: 10px;
+    }
+
+    .tabcontent {
+      display: none;
+    }
+
+    .active-tab {
+      display: block;
+    }
+
+    .sci-fi-box {
+      border: 2px solid #0FF;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 10px #0FF;
+      background: rgba(0,0,0,0.7);
+    }
+
+    .button {
+      background-color: #008080;
+      color: #FFF;
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: bold;
+      text-decoration: none; /* Ensures buttons look consistent */
+      display: inline-block; /* Allows proper spacing */
+    }
+
+    .button:hover {
+      background-color: #00FF00;
+      color: #000;
+      box-shadow: 0 0 10px #00FF00;
+    }
+
+    /* Inputs */
+    select, input[type="text"], input[type="file"] {
+      padding: 8px;
+      margin: 8px;
+      background-color: #222;
+      color: #FFF;
+      border: 1px solid #0FF;
+      border-radius: 5px;
+    }
+
+    /* Table for listing games */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      color: #FFF;
+    }
+
+    th, td {
+      border: 1px solid #0FF;
+      padding: 8px;
+    }
+
+    th {
+      background: #111;
+      font-weight: bold;
+    }
+
+    tr:hover {
+      background: rgba(0,255,255,0.2);
+    }
+
+    /* Video Player */
+    .video-container {
+      width: 100%;
+      height: 100vh; /* Full viewport height */
+    }
+    
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>GAME STREAMING AUTOMATION</h1>
+
+  <div class="tab">
+    <button class="tablinks" onclick="openTab(event, 'GameManagement')">Game Management</button>
+    <button class="tablinks" onclick="openTab(event, 'Utilities')">Utilities</button>
+    <button class="tablinks" onclick="openTab(event, 'VideoPlayer')">Video Player</button>
+    <button class="tablinks" onclick="openTab(event, 'DownloadInstall')">Download & Install</button>
+    <button class="tablinks" onclick="openTab(event, 'GameLaunchers')">Game Launchers</button>
+    <button class="tablinks" onclick="openTab(event, 'SunshineLocal')">Sunshine Localhost</button>
+    <button class="tablinks" onclick="openTab(event, 'WebPlayers')">Web Players</button>
+  </div>
+
+  <!-- GAME MANAGEMENT TAB -->
+  <div id="GameManagement" class="tabcontent active-tab">
+    <h2>Add Steam Game Command</h2>
+    <div class="sci-fi-box">
+      <input type="text" id="steamCommand" placeholder="steam://run/12345" required>
+      <input type="text" id="steamAppName" placeholder="Steam Game Name" required>
+      <input type="file" id="steamImage" accept="image/*" required>
+      <button class="button" onclick="addSteamGame()">Add to Sunshine</button>
+    </div>
+
+    <h2>Add Executable Game</h2>
+    <div class="sci-fi-box">
+      <input type="text" id="exePath" placeholder='e.g. "C:\\Games\\MyGame.exe"' required>
+      <input type="text" id="exeName" placeholder="Exe Game Name" required>
+      <input type="file" id="exeImage" accept="image/*" required>
+      <button class="button" onclick="addExeGame()">Add to Sunshine</button>
+    </div>
+
+    <h2>Current Games in Sunshine</h2>
+    <button class="button" onclick="loadGames()">View Games</button>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Command</th>
+          <th>Image</th>
+        </tr>
+      </thead>
+      <tbody id="gamesTableBody"></tbody>
+    </table>
+
+    <h2>Remove a Game</h2>
+    <div class="sci-fi-box">
+      <input type="text" id="removeGameName" placeholder="Enter Game Name to Remove">
+      <button class="button" onclick="removeGame()">Remove Game</button>
+    </div>
+  </div>
+
+  <!-- UTILITIES TAB -->
+  <div id="Utilities" class="tabcontent">
+    <h2>Utilities</h2>
+    <div class="sci-fi-box">
+      <button class="button" onclick="launchSteam()">Launch Steam</button>
+      <button class="button" onclick="launchMoonlight()">Launch Moonlight</button>
+      <button class="button" onclick="restartSunshine()">Restart Sunshine Service</button>
+    </div>
+  </div>
+
+  <!-- VIDEO PLAYER TAB -->
+  <div id="VideoPlayer" class="tabcontent">
+    <h2>Video Player</h2>
+    <div class="video-container">
+      <iframe id="vimeoPlayer" src="https://player.vimeo.com/video/1048781816?autoplay=1&muted=0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <!-- DOWNLOAD & INSTALL TAB -->
+  <div id="DownloadInstall" class="tabcontent">
+    <h2>Download & Install</h2>
+    <div class="sci-fi-box">
+      <a href="https://github.com/LizardByte/Sunshine/releases" class="button" target="_blank" rel="noopener">Download Sunshine</a>
+      <a href="https://store.steampowered.com/about/" class="button" target="_blank" rel="noopener">Download Steam</a>
+      <!-- New Moonlight Download Button Added Below -->
+      <a href="https://moonlight-stream.org/download.html" class="button" target="_blank" rel="noopener">Download Moonlight</a>
+    </div>
+  </div>
+
+  <!-- GAME LAUNCHERS TAB -->
+  <div id="GameLaunchers" class="tabcontent">
+    <h2>Game Launchers</h2>
+    <div class="sci-fi-box">
+      <p>Manage game launchers here...</p>
+      <!-- Added Download Buttons for Various Game Launchers Below -->
+      <a href="https://cdn.fastly.steamstatic.com/client/installer/SteamSetup.exe" class="button" target="_blank" rel="noopener">Download Steam Client</a>
+      <a href="https://webinstallers.gog-statics.com/download/GOG_Galaxy_2.0.exe?payload=uDIhLVaAoXC6YU5gijVGWDevCWh7S5lpqxzY5nWITwAoAsnsqicIR54eTmira8BbvKNQ6cyIoOoU2_ueCpLP1qFc0GBJ_iklm0E6vhz-BUlc8fkpGqEcfcfAdZBQf-NJdJe2r-ClH-IfGXFPtlfJPhOaqPw6qsCGG0hfKf73M-wmInWyIEAHhlNxCrFVYxUUdbEFwM94nyEFrDFBtdQFxSySgdBabYZ258_jlRofb7BqvNtDUIE7lKdhi7AZ9mTWuNOVsLUhapXKU7ZLXzWBv-Ldaz92Pf0Y4iD6C1Lkh1qLRj0ezIu7tZrXvZmiQCH3eGPFVTg6yzLJFS4gS3WzXxl9de1eDf1JK5wbrKCiJmOu4z1wnl_zKnEA2Eey5DvIiJRu9DMshUqSJHrUJEWvMiwMha17un9HOKbNJCKC5EeQsDG9VKhj0CuxiWGTCiU28v4HOKxCR39M_h7UoCzlxIXR0xa_VvYzoCFGlqYTkwQkLl8wah1Tg4gllSZeNg5shxVTvImYATT4lL3_87Dir_4yZIT6cqQ1HfF1l9P0wBsLzdNu-XYBBYGfLuM2QvsbNh057gsJGhtLa_-ouc-F_bGfW3Y5fxF_yKlxYUMaGA3CG4yqQaS6mAg2WqQXIHxBT82FxcNqerTwjQOhLwCxUuwKDs-vKU9PnUaJf1IyWi4." class="button" target="_blank" rel="noopener">Download GOG Galaxy 2.0</a>
+      <a href="https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi" class="button" target="_blank" rel="noopener">Download Epic Games Launcher</a>
+      <a href="https://www.ubisoft.com/en-gb/ubisoft-connect/download" class="button" target="_blank" rel="noopener">Download Ubisoft Connect</a>
+      <a href="https://playnite.link/download/PlayniteInstaller.exe" class="button" target="_blank" rel="noopener">Download Playnite Game Manager</a>
+      <a href="https://socialclub.rockstargames.com/rockstar-games-launcher?_gl=1*j57k5o*_ga*NDkzNzMzMjg2LjE3MzgwODMxOTc.*_ga_PJQ2JYZDQC*MTczODA4MzE5Ny4xLjAuMTczODA4MzE5Ny4wLjAuMA.." class="button" target="_blank" rel="noopener">Download Rockstar Games Launcher</a>
+      <a href="https://download.amazongames.com/AmazonGamesSetup.exe" class="button" target="_blank" rel="noopener">Download Amazon Games App</a>
+      <a href="https://download.battle.net/en-us/?platform=windows" class="button" target="_blank" rel="noopener">Download Battle.net Client</a>
+    </div>
+  </div>
+
+  <!-- SUNSHINE LOCALHOST TAB -->
+  <div id="SunshineLocal" class="tabcontent">
+    <h2>Sunshine Localhost Controls</h2>
+    <div class="sci-fi-box">
+      <p>Manage Sunshine localhost settings here...</p>
+      <!-- Add relevant options and buttons -->
+    </div>
+  </div>
+
+  <!-- WEB PLAYERS TAB -->
+  <div id="WebPlayers" class="tabcontent">
+    <h2>Web Players</h2>
+    <div class="sci-fi-box">
+      <p>Manage web players here...</p>
+      <!-- Add relevant options and buttons -->
+    </div>
+  </div>
+</div>
+
+<script>
+  // TABS
+  function openTab(evt, tabName) {
+    const tabcontent = document.getElementsByClassName("tabcontent");
+    for (let i=0; i<tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+      tabcontent[i].classList.remove("active-tab");
+    }
+    const tablinks = document.getElementsByClassName("tablinks");
+    for (let i=0; i<tablinks.length; i++) {
+      tablinks[i].style.backgroundColor = "";
+      tablinks[i].style.color = "#00FFFF"; // Reset text color
+    }
+    document.getElementById(tabName).style.display = "block";
+    document.getElementById(tabName).classList.add("active-tab");
+    evt.currentTarget.style.backgroundColor = "#00FF00";
+    evt.currentTarget.style.color = "#000";
+  }
+
+  // GAME MANAGEMENT FUNCTIONS
+  async function addSteamGame() {
+    const steamCommand = document.getElementById('steamCommand').value.trim();
+    const steamAppName = document.getElementById('steamAppName').value.trim();
+    const steamImage = document.getElementById('steamImage').files[0];
+
+    if (!steamCommand || !steamAppName) {
+      alert('Please enter both Steam command and name.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('steamCommand', steamCommand);
+    formData.append('steamAppName', steamAppName);
+    if (steamImage) {
+      formData.append('steamImage', steamImage);
+    }
+
+    try {
+      const res = await fetch('/api/add-steam-game', {
+        method: 'POST',
+        body: formData
+      });
+      const msg = await res.text();
+      if (!res.ok) throw new Error(msg);
+      alert(msg);
+      // Clear fields
+      document.getElementById('steamCommand').value = '';
+      document.getElementById('steamAppName').value = '';
+      document.getElementById('steamImage').value = '';
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+
+  async function addExeGame() {
+    const exePath = document.getElementById('exePath').value.trim();
+    const exeName = document.getElementById('exeName').value.trim();
+    const exeImage = document.getElementById('exeImage').files[0];
+
+    if (!exePath || !exeName) {
+      alert('Please enter both the EXE path and game name.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('exePath', exePath);
+    formData.append('exeName', exeName);
+    if (exeImage) {
+      formData.append('exeImage', exeImage);
+    }
+
+    try {
+      const res = await fetch('/api/add-exe-game', {
+        method: 'POST',
+        body: formData
+      });
+      const msg = await res.text();
+      if (!res.ok) throw new Error(msg);
+      alert(msg);
+      // Clear fields
+      document.getElementById('exePath').value = '';
+      document.getElementById('exeName').value = '';
+      document.getElementById('exeImage').value = '';
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+
+  async function loadGames() {
+    try {
+      const res = await fetch('/api/games');
+      const games = await res.json();
+      const tbody = document.getElementById('gamesTableBody');
+      tbody.innerHTML = ''; // Clear existing rows
+
+      games.forEach(game => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${game.name}</td>
+          <td>${game.cmd}</td>
+          <td><img src="${game['image-path']}" alt="${game.name} Image" width="50"></td>
+        `;
+        tbody.appendChild(row);
+      });
+    } catch (err) {
+      alert('Error loading games: ' + err.message);
+    }
+  }
+
+  async function removeGame() {
+    const gameName = document.getElementById('removeGameName').value.trim();
+    if (!gameName) {
+      alert('Please enter the name of the game to remove.');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/remove-game', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ gameName })
+      });
+      const msg = await res.text();
+      if (!res.ok) throw new Error(msg);
+      alert(msg);
+      document.getElementById('removeGameName').value = ''; // Clear field
+      loadGames(); // Refresh game list
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+
+  // UTILITIES FUNCTIONS
+  async function launchSteam() {
+    try {
+      const res = await fetch('/launch-steam', { method: 'POST' });
+      const msg = await res.text();
+      alert(msg);
+    } catch (err) {
+      alert('Error launching Steam: ' + err.message);
+    }
+  }
+
+  async function launchMoonlight() {
+    try {
+      const res = await fetch('/launch-moonlight', { method: 'POST' });
+      const msg = await res.text();
+      alert(msg);
+    } catch (err) {
+      alert('Error launching Moonlight: ' + err.message);
+    }
+  }
+
+  async function restartSunshine() {
+    try {
+      const res = await fetch('/restart-sunshine', { method: 'POST' });
+      const msg = await res.text();
+      alert(msg);
+    } catch (err) {
+      alert('Error restarting Sunshine: ' + err.message);
+    }
+  }
+</script>
+
+</body>
+</html>
